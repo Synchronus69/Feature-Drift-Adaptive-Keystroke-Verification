@@ -70,10 +70,10 @@ flowchart LR
 
 | | CMU (holdout) | KeyRecs (out-of-sample) |
 |---|---|---|
-| FAR (false accept rate) | 9.3% | 11.4% |
-| FRR (false reject rate) | 18.7% | 23.8% |
+| FAR (false accept rate) | 9.3% | 11.7% |
+| FRR (false reject rate) | 18.7% | 23.0% |
 | EER (equal error rate) | 11.7% | 16.5% |
-| Accuracy | 86.0% | 82.4% |
+| Accuracy | 86.0% | 82.6% |
 
 Alpha (the adaptation rate) and target_far were chosen on a validation
 subset of CMU users and locked before touching CMU's holdout users. Those
