@@ -1,4 +1,4 @@
-# Keystroke Authentication Under Behavioral Drift
+# Feature-Drift-Adaptive Keystroke Verification
 
 ## Overview
 A keystroke authentication method that adapts to a user's typing changing
@@ -51,7 +51,7 @@ its first real decision.
 
 ```mermaid
 flowchart LR
-    A[Enrollment session] --> B[Profile: median + Mean Absolute Deviation per feature]
+    A[Enrollment session] --> B[Profile: median + median absolute deviation per feature]
     B --> C[New attempt]
     C --> D{Strict threshold}
     D -- accept --> E[Access granted]
@@ -68,22 +68,31 @@ flowchart LR
 
 ## Results
 
-| | CMU (holdout) | KeyRecs (out-of-sample) |
-|---|---|---|
-| FAR (false accept rate) | 9.3% | 11.7% |
-| FRR (false reject rate) | 18.7% | 23.0% |
-| EER (equal error rate) | 11.7% | 16.5% |
-| Accuracy | 86.0% | 82.6% |
+| | CMU, fixed profile (baseline) | CMU, adaptive | KeyRecs, adaptive (out-of-sample) |
+|---|---|---|---|
+| FAR (false accept rate) | 7.6% | 9.3% | 11.7% |
+| FRR (false reject rate) | 39.1% | 18.7% | 23.0% |
+| EER (equal error rate) | 18.3% | 11.7% | 16.5% |
+| Accuracy | 76.7% | 86.0% | 82.6% |
 
-Alpha (the adaptation rate) and target_far were chosen on a validation
-subset of CMU users and locked before touching CMU's holdout users. Those
-same locked values were then reused unchanged on KeyRecs. The drop in
-accuracy from CMU to KeyRecs is expected, since KeyRecs is a different
-population and typing task, evaluated with no retuning. The one
-participant where the method failed outright (FRR near 100%) is a known
-cold-start case: their typing had drifted far enough by the second
-session that the strict threshold never accepted an attempt, so the
-profile had almost no chance to adapt.
+Both CMU columns are measured on the same 36 held-out users. The fixed
+profile is the same method with adaptation switched off. Adaptation cut
+the false reject rate roughly in half, from 39.1% to 18.7%, at the cost of
+a 1.7-point rise in the false accept rate. Whether that trade is
+acceptable depends on the deployment: it favors systems where locking out
+a legitimate user is more costly than an occasional false accept.
+
+Alpha (the adaptation rate) and target_far were chosen on a separate
+validation subset of 15 CMU users and locked before touching the holdout
+users. Those same locked values were then reused unchanged on KeyRecs.
+The drop from CMU to KeyRecs is expected, since KeyRecs is a different
+population and typing task, evaluated with no retuning.
+
+The worst KeyRecs result was a participant rejected on every
+second-session attempt. This is a sudden-drift failure: their typing in
+the second session was already far enough from their enrollment session
+that almost no attempts passed even the looser adapt threshold, so the
+profile could not begin following their new pattern.
 
 ## Exploratory checks
 
@@ -95,18 +104,23 @@ profile had almost no chance to adapt.
 - Holdout sets are small (36 CMU users, 99 KeyRecs participants), so
   individual metrics carry meaningful sampling variance and the reported
   averages should be read as estimates, not exact figures.
+- Each user's enrollment session is split into enroll and held-out data
+  with a single random seed. Results from other splits were not measured.
 - Both datasets are fixed-text password typing collected in a lab
   setting. Performance on free-text typing or in a real deployment is
   untested.
 - CMU spans 8 sessions across separate days and KeyRecs spans 2, so the
   method has been tested against drift accumulated over days, not the
   months or years a real deployment would need to handle.
+- The method has no recovery path for cold-start failures: if a user's
+  typing has already drifted past the adapt threshold, the profile never
+  updates.
 - This is a verification task (is this the claimed user), not
   identification (which user, out of many, produced this sample), which
   is the actual target use case and has not yet been built.
-- No supervised baseline, such as a periodically retrained classifier,
-  has been run for comparison, so the benefit of adaptive updating over
-  simple retraining is not directly measured here.
+- The only baseline is the same method without adaptation. No
+  periodically retrained classifier has been compared, so the benefit of
+  adaptive updating over simple retraining is not directly measured here.
 
 ## Next steps
 - Identification: given a typing sample, determine which of many
@@ -117,10 +131,10 @@ profile had almost no chance to adapt.
 
 ## Files
 - `cmu.ipynb`: method built and validated on CMU
-- `keyrecs.ipynb`: same method, unchanged, run on KeyRecs
+- `KeyRecs.ipynb`: same method, unchanged, run on KeyRecs
 - `cmu_keyrecs_sharedfunctions.py`: profile, scoring, and threshold
   functions shared by both notebooks
 
 ## Running this
 Install the requirements, download both datasets into this folder, then
-run `cmu.ipynb` followed by `keyrecs.ipynb`.
+run `cmu.ipynb` followed by `KeyRecs.ipynb`.
