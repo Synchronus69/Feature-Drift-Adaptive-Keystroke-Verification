@@ -64,7 +64,7 @@ flowchart LR
 - CMU DSL-StrongPasswordData (2009): 51 subjects, 8 sessions each,
   collected on separate days. [[link](https://www.cs.cmu.edu/~keystroke/)]
 - KeyRecs (2023), fixed-text condition: 99 participants, 2 sessions each.
-  [[link](https://zenodo.org/records/7886743/files/fixed-text.csv)]
+  [[link](https://zenodo.org/records/7886743)]
 
 ## Results
 
