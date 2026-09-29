@@ -51,7 +51,7 @@ its first real decision.
 
 ```mermaid
 flowchart LR
-    A[Enrollment session] --> B[Profile: median + MAD per feature]
+    A[Enrollment session] --> B[Profile: median + Mean Absolute Deviation per feature]
     B --> C[New attempt]
     C --> D{Strict threshold}
     D -- accept --> E[Access granted]
@@ -62,9 +62,9 @@ flowchart LR
 
 ## Datasets
 - CMU DSL-StrongPasswordData (2009): 51 subjects, 8 sessions each,
-  collected on separate days. [[link](https://www.cs.cmu.edu/~keystroke/DSL-StrongPasswordData.csv)]
+  collected on separate days. [[link](https://www.cs.cmu.edu/~keystroke/)]
 - KeyRecs (2023), fixed-text condition: 99 participants, 2 sessions each.
-  [[link](https://zenodo.org/records/7886743/files/fixed-text.csv?download=1)]
+  [[link](https://zenodo.org/records/7886743/files/fixed-text.csv)]
 
 ## Results
 
